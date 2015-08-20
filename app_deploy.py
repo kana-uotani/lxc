@@ -15,8 +15,11 @@ def CopyFile(name,fname):
     shutil.copy(fname,"/var/lib/lxc/{}/rootfs/home/ubuntu/{}".format(name,fname))
 
 def SrtScat(name,fname):
+    print name
+    print fname
+
     subprocess.check_call(['/usr/bin/lxc-attach','-n',name,'--','chmod','+x','home/ubuntu/{}'.format(fname)])
-    subprocess.check_call(['/usr/bin/lxc-attach','-n',name,'--','sh','-c','/usr/bin/socat TCP4-LISTEN:8000,fork,reuseaddr EXEC:./{} &'.format(fname)])
+    subprocess.check_call(['/usr/bin/lxc-attach','-n',name,'--','sh','-c','/usr/bin/socat TCP-LISTEN:8080,fork,reuseaddr EXEC:/home/ubuntu/{} &'.format(fname)])
 
 def main():
 
@@ -34,7 +37,6 @@ def main():
 
     SrtScat('ubuntu-ap1',fname)
     SrtScat('ubuntu-ap2',fname)
-    SrtScat('ubuntu-nginx',fname)
 
 if __name__ == '__main__':
     main()
