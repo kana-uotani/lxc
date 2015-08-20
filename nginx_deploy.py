@@ -3,40 +3,37 @@
 
 import subprocess
 import shutil
+import sys
 
 def Filegen(fname):
     with open(fname,'w') as f:
         f.write("内容")
 
-def InsPython(name):
-    subprocess.check_call(['/usr/bin/lxc-attach','-n',name,'--','/usr/bin/apt-get','install','python'])
+def InsNginx(name):
+    subprocess.check_call(['/usr/bin/lxc-attach','-n',name,'--','/usr/bin/apt-get','install','nginx'])
 
 def CopyFile(name,fname):
     shutil.copy(fname,"/var/lib/lxc/{}/rootfs/home/ubuntu/{}".format(name,fname))
 
-def SrtScat(name,fname):
-    print name
-    print fname
+def NginxConfigtest(name,fname):
+    subprocess.check_output(['/usr/bin/lxc-attach','-n',name,'--','/etc/init.d/nginx','configtest'])
 
-    subprocess.check_call(['/usr/bin/lxc-attach','-n',name,'--','chmod','+x','home/ubuntu/{}'.format(fname)])
-    subprocess.check_call(['/usr/bin/lxc-attach','-n',name,'--','sh','-c','/usr/bin/socat TCP-LISTEN:8080,fork,reuseaddr EXEC:/home/ubuntu/{} &'.format(fname)])
+def NginxStart(name):
+    subprocess.check_output(['/usr/bin/lxc-attach','-n',name,'--','service','nginx','start'])
+
+def NginxRestart(name):
+    subprocess.check_output(['/usr/bin/lxc-attach','-n',name,'--','service','nginx','restart'])
 
 def main():
 
-    fname = "web_test.py"
+    name="ubuntu-nginx"
+    
 
-    #Filegen(fname)
 
-    InsPython('ubuntu-ap1')
-    InsPython('ubuntu-ap2')
-    InsPython('ubuntu-nginx')
+    InsNginx(name)
 
-    CopyFile('ubuntu-ap1',fname)
-    CopyFile('ubuntu-ap2',fname)
-    CopyFile('ubuntu-nginx',fname)
+    (name)
 
-    SrtScat('ubuntu-ap1',fname)
-    SrtScat('ubuntu-ap2',fname)
 
 if __name__ == '__main__':
     main()
