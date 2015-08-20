@@ -1,20 +1,16 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-#引数restart、stopでそれぞれnginxが再起動と停止をします。
+#引数start,restart,stopでそれぞれnginxが起動、再起動、停止をします。
 
 import subprocess
-import shutil
 import sys
-
-def Filegen(fname):
-    with open(fname,'w') as f:
-        f.write("内容")
+import shutil
 
 def InsNginx(name):
     subprocess.check_call(['/usr/bin/lxc-attach','-n',name,'--','/usr/bin/apt-get','install','nginx'])
 
-def NginxConfigtest(name,fname):
+def NginxConfigtest(name):
     subprocess.check_output(['/usr/bin/lxc-attach','-n',name,'--','/etc/init.d/nginx','configtest'])
 
 def NginxStart(name):
@@ -26,8 +22,8 @@ def NginxRestart(name):
 def NginxStop(name):
     subprocess.check_output(['/usr/bin/lxc-attach','-n',name,'--','service','nginx','stop'])
 
-def NginxConfGen(text):
-    subprocess.check_output(['cat','/var/lib/lxc/ubuntu-nginx/rootfs/etc/nginx/sites-enabled/default',text,'>','/var/lib/lxc/ubuntu-nginx/rootfs/etc/nginx/sites-enabled/default'])
+def NginxConfCopy(text):
+    shutil.copyfile(text,'/var/lib/lxc/ubuntu-nginx/rootfs/etc/nginx/sites-available/default')
 
 def main():
 
@@ -35,7 +31,7 @@ def main():
     print argvs
     name="ubuntu-nginx"
 
-    text="/home/kana/lxc/app_conf.txt"
+    text="/home/kana/lxc/default.new"
 
     InsNginx(name)
     
@@ -49,7 +45,9 @@ def main():
         NginxStart(name)
         print argvs[1]
 
-    NginxConfGen(text)
+    NginxConfigtest(name)
+
+    NginxConfCopy(text)
 
 if __name__ == '__main__':
     main()
