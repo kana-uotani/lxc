@@ -13,7 +13,7 @@ def InsSocat(name):
     subprocess.check_call(['/usr/bin/lxc-attach','-n',name,'--','/usr/bin/apt-get','install','socat'])
 
 def SrtScat(name):
-    subprocess.check_call(['/usr/bin/lxc-attach','-n',name,'--','sh','-c','/usr/bin/socat TCP4-LISTEN:8000,fork,reuseaddr EXEC:"hostname" &'])
+    subprocess.check_call(['/usr/bin/lxc-attach','-n',name,'--','sh','-c','/usr/bin/socat TCP-LISTEN:8080,fork,reuseaddr EXEC:"date" &'])
 
 def main():
 
