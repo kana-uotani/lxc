@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+#引数restart、stopでそれぞれnginxが再起動と停止をします。
+
 import subprocess
 import shutil
 import sys
@@ -24,15 +26,23 @@ def NginxStart(name):
 def NginxRestart(name):
     subprocess.check_output(['/usr/bin/lxc-attach','-n',name,'--','service','nginx','restart'])
 
+def NginxStop(name):
+    subprocess.check_output(['/usr/bin/lxc-attach','-n',name,'--','service','nginx','stop'])
+
 def main():
 
-    name="ubuntu-nginx"
-    
+    argvs=sys.argv
 
+    name="ubuntu-nginx"
 
     InsNginx(name)
-
-    (name)
+    
+    if argvs[1]=="restart":
+        NginxRestart(name)
+    elif argvs[1]=="stop":
+        NginxStop(Stop)
+    else:
+        NginxStart(name)
 
 
 if __name__ == '__main__':
