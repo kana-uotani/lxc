@@ -2,33 +2,25 @@
 # -*- coding: utf-8 -*-
 
 import subprocess
-import sys
-
+import shutil
 
 def Filegen(fname):
-    with open(fname) as f:
+    with open(fname,'w') as f:
         f.write("内容")
 
 def InsPython(name):
-    check = subprocess.check_call(['/usr/bin/lxc-attach','-n',name,'--','/usr/bin/apt-get','install','python'])
-    CheckOut(check)
+    subprocess.check_call(['/usr/bin/lxc-attach','-n',name,'--','/usr/bin/apt-get','install','python'])
 
 def CopyFile(name,fname):
-    check = subprocess.check_call(['cp',fname,'/var/lib/lxc/%s/rootfs/home/ubuntu/%s'(name,fname),])
-    CheckOut(check)
+    shutil.copy(fname,"/var/lib/lxc/{}/rootfs/home/ubuntu/{}".format(name,fname))
 
 def SrtScat(name,fname):
-    subprocess.check_call(['/usr/bin/lxc-attach','-n',name,'--','chmod','+x','home/ubuntu/%s'(fname)])
-    check = subprocess.check_call(['/usr/bin/lxc-attach','-n',name,'--','sh','-c','/usr/bin/socat TCP4-LISTEN:8000,fork,reuseaddr EXEC:./%s &'(fname)])
-    CheckOut(check)
-
-def CheckOut(check):
-    if check != 0 :
-        sys.exit()
+    subprocess.check_call(['/usr/bin/lxc-attach','-n',name,'--','chmod','+x','home/ubuntu/{}'.format(fname)])
+    subprocess.check_call(['/usr/bin/lxc-attach','-n',name,'--','sh','-c','/usr/bin/socat TCP4-LISTEN:8000,fork,reuseaddr EXEC:./{} &'.format(fname)])
 
 def main():
 
-    fname = "web-test.py"
+    fname = "web_test.py"
 
     #Filegen(fname)
 
