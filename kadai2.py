@@ -1,23 +1,37 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import commands
+import subprocess
+
+def CrtContainer(name):
+    subprocess.check_call(['/usr/bin/lxc-create','-t','ubuntu','-n',name])
+
+def SrtContainer(name):
+    subprocess.check_call(['/usr/bin/lxc-start','-n',name,'-d'])
+
+def InsSocat(name):
+    subprocess.check_call(['/usr/bin/lxc-attach','-n',name,'--','/usr/bin/apt-get','install','socat'])
+
+def SrtScat(name):
+    subprocess.check_call(['/usr/bin/lxc-attach','-n',name,'--','sh','-c','/usr/bin/socat TCP-LISTEN:8080,fork,reuseaddr EXEC:"date" &'])
 
 def main():
 
-    print commands.getoutput("lxc-create -t ubuntu -n ubuntu-ap1")
-    print commands.getoutput("lxc-create -t ubuntu -n ubuntu-ap2")
-    print commands.getoutput("lxc-create -t ubuntu -n ubuntu-nginx")
+#    CrtContainer('ubuntu-ap1')
+#    CrtContainer('ubuntu-ap2')
+#    CrtContainer('ubuntu-nginx')
+    
+    SrtContainer('ubuntu-ap1')
+    SrtContainer('ubuntu-ap2')
+    SrtContainer('ubuntu-nginx')
 
-    print commands.getoutput("lxc-start -n ubuntu-ap1 -d")
-    print commands.getoutput("lxc-start -n ubuntu-ap2 -d")
-    print commands.getoutput("lxc-start -n ubuntu-nginx -d")
+    InsSocat('ubuntu-ap1')
+    InsSocat('ubuntu-ap2')
 
-    print commands.getoutput("lxc-attach -n ubuntu-ap1 -- apt-get install socat")
-    print commands.getoutput("lxc-attach -n ubuntu-ap2 -- apt-get install socat")
-
-    print commands.getoutput("lxc-attach -n ubuntu-ap1 -- sh -c 'socat TCP4-LISTEN:8000,fork,reuseaddr EXEC:\"hostname\" &'")
-    print commands.getoutput("lxc-attach -n ubuntu-ap2 -- sh -c 'socat TCP4-LISTEN:8000,fork,reuseaddr EXEC:\"hostname\" &'")
+    SrtScat('ubuntu-ap1')
+    SrtScat('ubuntu-ap2')
+    
+    print "End"
 
 if __name__ == '__main__':
     main()
