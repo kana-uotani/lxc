@@ -14,9 +14,6 @@ def Filegen(fname):
 def InsNginx(name):
     subprocess.check_call(['/usr/bin/lxc-attach','-n',name,'--','/usr/bin/apt-get','install','nginx'])
 
-def CopyFile(name,fname):
-    shutil.copy(fname,"/var/lib/lxc/{}/rootfs/home/ubuntu/{}".format(name,fname))
-
 def NginxConfigtest(name,fname):
     subprocess.check_output(['/usr/bin/lxc-attach','-n',name,'--','/etc/init.d/nginx','configtest'])
 
@@ -29,21 +26,30 @@ def NginxRestart(name):
 def NginxStop(name):
     subprocess.check_output(['/usr/bin/lxc-attach','-n',name,'--','service','nginx','stop'])
 
+def NginxConfGen(text):
+    subprocess.check_output(['cat','/var/lib/lxc/ubuntu-nginx/rootfs/etc/nginx/sites-enabled/default',text,'>','/var/lib/lxc/ubuntu-nginx/rootfs/etc/nginx/sites-enabled/default'])
+
 def main():
 
     argvs=sys.argv
-
+    print argvs
     name="ubuntu-nginx"
+
+    text="/home/kana/lxc/app_conf.txt"
 
     InsNginx(name)
     
     if argvs[1]=="restart":
         NginxRestart(name)
+        print argvs[1]
     elif argvs[1]=="stop":
-        NginxStop(Stop)
-    else:
+        NginxStop(name)
+        print argvs[1]
+    elif argvs[1]=="start":
         NginxStart(name)
+        print argvs[1]
 
+    NginxConfGen(text)
 
 if __name__ == '__main__':
     main()
